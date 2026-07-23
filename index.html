@@ -3,251 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Stikbot 10: Protector of Earth - Platformer Edition</title>
+    <title>Stikbot 10: Protector of Earth - 3DS Web Edition</title>
     <style>
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-        body {
-            margin: 0; padding: 10px; background-color: #030712; color: #fff;
-            font-family: 'Impact', 'Arial Black', sans-serif;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;
-        }
-        #game-container {
-            position: relative; box-shadow: 0 0 45px rgba(34, 197, 94, 0.6);
-            border-radius: 12px; overflow: hidden; width: 100%; max-width: 800px; border: 4px solid #22c55e;
-            background: #000;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+        body { background-color: #030712; color: #fff; font-family: sans-serif; text-align: center; padding: 5px; }
+        
+        #game-container { position: relative; width: 100%; max-width: 800px; margin: 0 auto; border: 3px solid #22c55e; background: #000; }
         canvas { display: block; width: 100%; height: auto; }
-        .controls-container { width: 100%; max-width: 800px; margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
-        
-        .top-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; width:100%; max-width:800px; margin-bottom:5px; flex-wrap: wrap; }
 
+        .top-bar { display: flex; justify-content: space-between; align-items: center; max-width: 800px; margin: 0 auto 5px auto; flex-wrap: wrap; gap: 4px; }
+        
         .dlc-btn {
-            background: #1e293b; color: #aaa; border: 2px solid #334155; padding: 6px 10px; font-weight: bold;
-            font-size: 0.7rem; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: all 0.15s ease;
+            background: #1e293b; color: #fff; border: 1px solid #334155; padding: 6px 8px;
+            font-size: 0.75rem; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase;
         }
-        .dlc-btn.active { background: #22c55e; color: #000; border-color: #22c55e; box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
-        .dlc-btn.cheat-btn { background: #eab308; color: #000; border-color: #facc15; }
-        .dlc-btn.exit-btn { background: #ef4444; color: #fff; border-color: #f87171; }
-        .dlc-btn.shop-btn { background: #38bdf8; color: #000; border-color: #0284c7; }
+        .dlc-btn:active { background: #22c55e; color: #000; }
 
-        .coin-counter {
-            background: #0f172a; border: 2px solid #eab308; color: #facc15; padding: 4px 10px;
-            border-radius: 6px; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 4px;
-        }
-
-        .alien-selector { display: flex; overflow-x: auto; gap: 6px; padding: 8px; background: #0f172a; border-radius: 8px; border: 2px solid #1e293b; }
-        .alien-btn {
-            background: #1e293b; color: #fff; border: 2px solid #334155; padding: 8px 12px;
-            border-radius: 6px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; cursor: pointer; flex-shrink: 0; opacity: 0.3; transition: all 0.15s ease;
-        }
-        .alien-btn.unlocked { opacity: 1.0; border-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.4); }
-        .alien-btn.locked { cursor: not-allowed; border-color: #475569; }
-        
-        .touch-pad { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; }
-        .d-pad { display: grid; grid-template-columns: repeat(3, 45px); grid-template-rows: repeat(3, 45px); gap: 5px; }
-        .action-btns { display: flex; gap: 10px; }
-        .btn {
-            background: rgba(255, 255, 255, 0.2); border: 2px solid #64748b; color: white; border-radius: 50%;
-            font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; touch-action: manipulation;
-        }
-        .btn:active { background: rgba(34, 197, 94, 0.8); border-color: #22c55e; }
-        .btn-action { width: 58px; height: 58px; border-radius: 14px; }
-        .btn-evolve { background: rgba(239, 68, 68, 0.3); border-color: #ef4444; color: #fca5a5; }
-        .btn-evolve:active { background: #ef4444; color: #fff; }
-
+        /* 3DS-FRIENDLY OVERLAY SCREEN */
         .overlay-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 7, 18, 0.95); display: flex; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 100; padding: 20px;
+            background: #030712; z-index: 999; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 10px;
         }
 
-        .menu-title {
-            font-size: 2.2rem; color: #22c55e; font-style: italic; margin-bottom: 5px;
-            text-shadow: 0 0 20px rgba(34, 197, 94, 0.8), 3px 3px 0 #000;
+        .menu-title { font-size: 1.8rem; color: #22c55e; font-weight: bold; margin-bottom: 2px; }
+        .menu-subtitle { font-size: 0.8rem; color: #94a3b8; margin-bottom: 12px; }
+        
+        .menu-btn {
+            display: block; width: 220px; padding: 10px; margin: 4px 0; background: #1e293b;
+            color: #fff; border: 2px solid #22c55e; font-size: 0.95rem; font-weight: bold;
+            border-radius: 6px; cursor: pointer; text-transform: uppercase;
         }
-        .menu-subtitle { font-size: 0.9rem; color: #94a3b8; margin-bottom: 25px; letter-spacing: 2px; }
-        .menu-btn-group { display: flex; flex-direction: column; gap: 12px; width: 260px; }
-        .menu-main-btn {
-            background: #1e293b; color: #fff; border: 2px solid #22c55e; padding: 12px;
-            font-size: 1.1rem; border-radius: 8px; cursor: pointer; text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.2); transition: all 0.2s ease;
-        }
-        .menu-main-btn:hover, .menu-main-btn:active {
-            background: #22c55e; color: #000; box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
-        }
+        .menu-btn:active { background: #22c55e; color: #000; }
 
-        .shop-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px; width: 100%; max-width: 720px; margin-bottom: 15px;
-        }
-        .shop-card {
-            background: #0f172a; border: 2px solid #334155; border-radius: 10px; padding: 12px;
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-        }
-        .shop-card.unlocked { border-color: #22c55e; }
-        .shop-card .title { font-size: 1rem; color: #fff; margin-bottom: 4px; }
-        .shop-card .price { font-size: 0.85rem; color: #facc15; font-weight: bold; margin-bottom: 8px; }
-        .shop-buy-btn {
-            background: #eab308; color: #000; border: none; padding: 8px 16px; border-radius: 6px;
-            font-weight: bold; font-size: 0.85rem; cursor: pointer; text-transform: uppercase;
-        }
-        .shop-buy-btn.owned { background: #22c55e; color: #000; cursor: default; }
+        /* CONTROLS */
+        .controls-container { max-width: 800px; margin: 5px auto 0 auto; }
+        .alien-selector { display: flex; overflow-x: auto; gap: 4px; padding: 6px; background: #0f172a; border-radius: 6px; }
+        .alien-btn { background: #1e293b; color: #fff; border: 1px solid #334155; padding: 6px 10px; font-size: 0.75rem; font-weight: bold; white-space: nowrap; cursor: pointer; }
+        .alien-btn.unlocked { border-color: #22c55e; }
+        .alien-btn.locked { opacity: 0.4; }
 
-        .level-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 10px; width: 100%; max-width: 720px; max-height: 250px; overflow-y: auto; padding: 10px;
-            background: #0f172a; border-radius: 8px; border: 2px solid #1e293b; margin-bottom: 15px;
-        }
-        .level-card {
-            background: #1e293b; border: 2px solid #334155; border-radius: 8px; padding: 10px;
-            cursor: pointer; text-align: center; transition: all 0.2s ease;
-        }
-        .level-card.unlocked:hover, .level-card.unlocked:active {
-            border-color: #22c55e; background: #22c55e; color: #000; transform: scale(1.03);
-        }
-        .level-card.locked { opacity: 0.4; cursor: not-allowed; border-color: #475569; }
-        .level-card .lvl-num { font-size: 0.75rem; color: #a855f7; font-weight: bold; }
-        .level-card .lvl-name { font-size: 0.85rem; font-weight: bold; margin: 4px 0; }
-        .level-card .lvl-boss { font-size: 0.65rem; color: #ef4444; text-transform: uppercase; }
-
-        .code-display { display: flex; gap: 10px; margin: 10px 0; }
-        .code-slot {
-            width: 48px; height: 48px; border: 2px solid #22c55e; background: #0f172a;
-            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-            color: #22c55e; border-radius: 8px; font-weight: bold;
-        }
+        .touch-pad { display: flex; justify-content: space-between; align-items: center; padding: 8px; }
+        .d-pad { display: grid; grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(3, 40px); gap: 4px; }
+        .action-btns { display: flex; gap: 8px; }
+        .btn { background: #334155; border: 1px solid #64748b; color: white; border-radius: 50%; font-weight: bold; font-size: 1rem; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; }
+        .btn:active { background: #22c55e; }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <h2 style="margin:0; color:#22c55e; font-style:italic;" id="modeTitle">STIKBOT 10: PROTECTOR OF EARTH</h2>
-        <div style="display:flex; gap:4px; align-items:center;">
-            <div class="coin-counter">🪙 <span id="coinText">0</span></div>
-            <button class="dlc-btn shop-btn" onclick="openShop()">STORE 🛒</button>
-            <button class="dlc-btn exit-btn" onclick="exitFight()">EXIT FIGHT 🚪</button>
-            <button class="dlc-btn" onclick="openMainMenu()">MAIN MENU 🏠</button>
-            <button class="dlc-btn" onclick="openLevelSelect()">LEVEL SELECT 🗺️</button>
-            <button class="dlc-btn cheat-btn" onclick="toggleCheatMenu()">CODES 🔑</button>
-        </div>
+        <button class="dlc-btn" id="btnShop">STORE 🛒</button>
+        <button class="dlc-btn" id="btnExit">EXIT 🚪</button>
+        <button class="dlc-btn" id="btnMenu">MENU 🏠</button>
+        <button class="dlc-btn" id="btnLevels">LEVELS 🗺️</button>
+        <button class="dlc-btn" id="btnCheats">CODES 🔑</button>
     </div>
     
     <div id="game-container">
         <canvas id="gameCanvas" width="800" height="400"></canvas>
 
-        <!-- MAIN MENU -->
+        <!-- MAIN MENU OVERLAY -->
         <div id="mainMenuModal" class="overlay-screen">
             <div class="menu-title">STIKBOT 10</div>
-            <div class="menu-subtitle">PROTECTOR OF EARTH PLATFORMER</div>
+            <div class="menu-subtitle">PROTECTOR OF EARTH</div>
 
-            <div class="menu-btn-group">
-                <button class="menu-main-btn" onclick="startCampaign('CLASSIC')">STORY CAMPAIGN</button>
-                <button class="menu-main-btn" style="border-color:#38bdf8;" onclick="openShop()">DLC STORE 🛒</button>
-                <button class="menu-main-btn" style="border-color:#a855f7;" onclick="openLevelSelect()">LEVEL SELECT</button>
-                <button class="menu-main-btn" style="border-color:#facc15; color:#facc15;" onclick="toggleCheatMenu()">OMNIVERSE CHEATS</button>
-            </div>
+            <button class="menu-btn" id="btnStartGame">STORY CAMPAIGN</button>
+            <button class="menu-btn" style="border-color:#38bdf8;" id="btnOpenStore">DLC STORE 🛒</button>
+            <button class="menu-btn" style="border-color:#a855f7;" id="btnOpenLevels">LEVEL SELECT</button>
+            <button class="menu-btn" style="border-color:#facc15;" id="btnOpenCheats">OMNIVERSE CHEATS</button>
         </div>
 
-        <!-- DLC STORE -->
-        <div id="shopModal" class="overlay-screen" style="display:none;">
-            <h3 style="color:#38bdf8; margin:0 0 5px 0;">OMNITRIX EXPANSION STORE</h3>
-            <p style="font-size:0.8rem; color:#aaa; margin-bottom:15px;">EARN OMNI-COINS BY DEFEATING STAGE BOSSES!</p>
-
-            <div class="shop-grid">
-                <div class="shop-card unlocked">
-                    <div class="title">CLASSIC CAMPAIGN</div>
-                    <div class="price">INCLUDED WITH GAME</div>
-                    <button class="shop-buy-btn owned">UNLOCKED</button>
-                </div>
-
-                <div class="shop-card" id="cardAF">
-                    <div class="title">ALIEN FORCE DLC</div>
-                    <div class="price">🪙 1,000 COINS</div>
-                    <button class="shop-buy-btn" id="buyBtnAF" onclick="buyDLC('AF', 1000)">PURCHASE</button>
-                </div>
-
-                <div class="shop-card" id="cardSOTO">
-                    <div class="title">SECRET OF OMNITRIX</div>
-                    <div class="price">🪙 1,500 COINS</div>
-                    <button class="shop-buy-btn" id="buyBtnSOTO" onclick="buyDLC('SOTO', 1500)">PURCHASE</button>
-                </div>
-
-                <div class="shop-card" id="cardUA">
-                    <div class="title">ULTIMATE ALIEN DLC</div>
-                    <div class="price">🪙 2,500 COINS</div>
-                    <button class="shop-buy-btn" id="buyBtnUA" onclick="buyDLC('UA', 2500)">PURCHASE</button>
-                </div>
-            </div>
-
-            <button class="dlc-btn active" onclick="closeShop()">BACK TO MENU</button>
-        </div>
-
-        <!-- LEVEL SELECT -->
-        <div id="levelSelectModal" class="overlay-screen" style="display:none;">
-            <h3 style="color:#22c55e; margin:0 0 5px 0;">STAGE SELECT HUD</h3>
-            
-            <div style="display:flex; gap:6px; margin-bottom:12px;">
-                <button class="dlc-btn active" id="selBtnClassic" onclick="filterLevelSelect('CLASSIC')">CLASSIC (10)</button>
-                <button class="dlc-btn" id="selBtnAF" onclick="filterLevelSelect('AF')">ALIEN FORCE (5)</button>
-                <button class="dlc-btn" id="selBtnSOTO" onclick="filterLevelSelect('SOTO')">SOTO (4)</button>
-                <button class="dlc-btn" id="selBtnUA" onclick="filterLevelSelect('UA')">ULTIMATE ALIEN (5)</button>
-            </div>
-
-            <div class="level-grid" id="levelGridContainer"></div>
-
-            <button class="dlc-btn active" onclick="closeLevelSelect()">BACK TO MENU</button>
-        </div>
-
-        <!-- GAME OVER -->
-        <div id="gameOverModal" class="overlay-screen" style="display:none;">
-            <h2 style="color:#ef4444; font-size:2.5rem; margin:0 0 10px 0; text-shadow:0 0 15px #ef4444;">DEFEATED!</h2>
-            <p style="color:#aaa; margin-bottom:20px;">BEN TENNYSON FELL IN BATTLE!</p>
-            <div style="display:flex; gap:12px;">
-                <button class="menu-main-btn" style="border-color:#ef4444; color:#ef4444; width:130px;" onclick="retryLevel()">RETRY</button>
-                <button class="menu-main-btn" style="width:150px;" onclick="exitFight()">LEVEL SELECT</button>
-            </div>
-        </div>
-
-        <!-- VICTORY OVERLAY -->
-        <div id="victoryModal" class="overlay-screen" style="display:none;">
-            <h2 style="color:#22c55e; font-size:2.5rem; margin:0 0 10px 0; text-shadow:0 0 20px #22c55e;">STAGE CLEAR!</h2>
-            <p style="color:#38bdf8; margin-bottom:10px;" id="victorySubText">BOSS DEFEATED!</p>
-            <p style="color:#facc15; font-size:1.2rem; margin-bottom:20px;" id="rewardText">+350 OMNI-COINS EARNED!</p>
-            <div style="display:flex; gap:12px;">
-                <button class="menu-main-btn" style="width:150px;" id="nextStageBtn" onclick="nextLevel()">NEXT STAGE</button>
-                <button class="menu-main-btn" style="border-color:#38bdf8; color:#38bdf8; width:150px;" onclick="exitFight()">LEVEL SELECT</button>
-            </div>
-        </div>
-
-        <!-- CHEAT WHEEL -->
-        <div id="cheatModal" class="overlay-screen" style="display:none;">
-            <h3 style="color:#22c55e; margin:0;">OMNIVERSE CODE WHEEL</h3>
-            <p style="font-size:0.75rem; color:#aaa; margin:4px 0;">SELECT A 4-ALIEN CODE SEQUENCE:</p>
-
-            <div class="code-display">
-                <div class="code-slot" id="slot0">-</div>
-                <div class="code-slot" id="slot1">-</div>
-                <div class="code-slot" id="slot2">-</div>
-                <div class="code-slot" id="slot3">-</div>
-            </div>
-
-            <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center; max-width:440px; margin-bottom:10px;">
-                <button class="alien-btn unlocked" onclick="pressCheatAlien('01')">01 BEN</button>
-                <button class="alien-btn unlocked" onclick="pressCheatAlien('02')">02 FOUR ARMS</button>
-                <button class="alien-btn unlocked" onclick="pressCheatAlien('03')">03 HEATBLAST</button>
-                <button class="alien-btn unlocked" onclick="pressCheatAlien('04')">04 XLR8</button>
-                <button class="alien-btn unlocked" onclick="pressCheatAlien('05')">05 CANNONBOLT</button>
-                <button class="alien-btn unlocked" onclick="pressCheatAlien('06')">06 DIAMONDHEAD</button>
-                <button class="alien-btn unlocked" onclick="pressCheatAlien('07')">07 WILDMUTT</button>
-                <button class="alien-btn unlocked" onclick="pressCheatAlien('08')">08 RIPJAWS</button>
-                <button class="alien-btn unlocked" onclick="pressCheatAlien('09')">09 STINKFLY</button>
-                <button class="alien-btn unlocked" onclick="pressCheatAlien('10')">10 UPGRADE</button>
-            </div>
-
-            <div style="display:flex; gap:10px;">
-                <button class="dlc-btn" style="background:#ef4444; color:#fff;" onclick="resetCheatCode()">CLEAR</button>
-                <button class="dlc-btn active" onclick="toggleCheatMenu()">CLOSE</button>
-            </div>
+        <!-- SIMPLE MODALS -->
+        <div id="simpleModal" class="overlay-screen" style="display:none;">
+            <div class="menu-title" id="modalTitle">TITLE</div>
+            <div class="menu-subtitle" id="modalText">Message goes here...</div>
+            <button class="menu-btn" id="btnCloseModal">BACK TO MENU</button>
         </div>
     </div>
 
@@ -261,552 +92,107 @@
                 <div></div><button class="btn" id="btnDown">▼</button><div></div>
             </div>
             <div class="action-btns">
-                <button class="btn btn-action btn-evolve" id="btnEvolve">E<br><span style="font-size:0.5rem">EVOLVE</span></button>
-                <button class="btn btn-action" id="btnAttack">Z<br><span style="font-size:0.6rem">ATTACK</span></button>
-                <button class="btn btn-action" id="btnSpecial">X<br><span style="font-size:0.6rem">SPECIAL</span></button>
+                <button class="btn" id="btnAttack">Z</button>
+                <button class="btn" id="btnSpecial">X</button>
             </div>
         </div>
     </div>
 
 <script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+// Canvas & State Setup
+var canvas = document.getElementById('gameCanvas');
+var ctx = canvas.getContext('2d');
 
-let omniCoins = 500;
-let unlockedDLCs = { CLASSIC: true, AF: false, SOTO: false, UA: false };
-let unlockedStageProgress = { CLASSIC: 0, AF: 0, SOTO: 0, UA: 0 };
+var isFightActive = false;
+var cameraX = 0;
 
-function updateCoinDisplay() {
-    document.getElementById('coinText').innerText = omniCoins.toLocaleString();
-}
-
-function updateShopUI() {
-    updateCoinDisplay();
-    ['AF', 'SOTO', 'UA'].forEach(key => {
-        const card = document.getElementById(`card${key}`);
-        const btn = document.getElementById(`buyBtn${key}`);
-        if (unlockedDLCs[key] || masterControlActive) {
-            card.classList.add('unlocked');
-            btn.classList.add('owned');
-            btn.innerText = "UNLOCKED";
-        } else {
-            card.classList.remove('unlocked');
-            btn.classList.remove('owned');
-            btn.innerText = "PURCHASE";
-        }
-    });
-}
-
-function buyDLC(dlcKey, price) {
-    if (unlockedDLCs[dlcKey]) return;
-    if (omniCoins >= price || masterControlActive) {
-        if (!masterControlActive) omniCoins -= price;
-        unlockedDLCs[dlcKey] = true;
-        playSound('cheat');
-        updateShopUI();
-    } else {
-        alert("NOT ENOUGH OMNI-COINS!");
-    }
-}
-
-function openShop() {
-    isFightActive = false;
-    document.getElementById('mainMenuModal').style.display = 'none';
-    document.getElementById('levelSelectModal').style.display = 'none';
-    document.getElementById('shopModal').style.display = 'flex';
-    updateShopUI();
-}
-
-function closeShop() {
-    document.getElementById('shopModal').style.display = 'none';
-    openMainMenu();
-}
-
-let audioCtx = null;
-function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-function playSound(type) {
-    if (!audioCtx) return;
-    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    const now = audioCtx.currentTime;
-
-    if (type === 'transform') {
-        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(160, now); osc.frequency.exponentialRampToValueAtTime(750, now + 0.25);
-        gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-        osc.start(now); osc.stop(now + 0.25);
-    } else if (type === 'jump') {
-        osc.type = 'sine'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(400, now + 0.15);
-        gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-        osc.start(now); osc.stop(now + 0.15);
-    } else if (type === 'punch') {
-        osc.type = 'triangle'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(30, now + 0.1);
-        gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        osc.start(now); osc.stop(now + 0.1);
-    } else if (type === 'alarm') {
-        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(800, now); osc.frequency.linearRampToValueAtTime(300, now + 0.4);
-        gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-        osc.start(now); osc.stop(now + 0.4);
-    } else if (type === 'cheat') {
-        osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(1200, now + 0.5);
-        gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-        osc.start(now); osc.stop(now + 0.5);
-    }
-}
-window.addEventListener('touchstart', () => initAudio(), { once: true });
-window.addEventListener('keydown', () => initAudio(), { once: true });
-
-// CHEAT ENGINE
-let inputSequence = [];
-let masterControlActive = false;
-let godModeActive = false;
-let oneHitKOActive = false;
-
-function toggleCheatMenu() {
-    const modal = document.getElementById('cheatModal');
-    modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-    resetCheatCode();
-}
-
-function resetCheatCode() {
-    inputSequence = [];
-    for (let i = 0; i < 4; i++) {
-        document.getElementById(`slot${i}`).innerText = "-";
-    }
-}
-
-function pressCheatAlien(alienNum) {
-    if (inputSequence.length < 4) {
-        inputSequence.push(alienNum);
-        document.getElementById(`slot${inputSequence.length - 1}`).innerText = alienNum;
-        if (inputSequence.length === 4) checkOmniverseCode();
-    }
-}
-
-function checkOmniverseCode() {
-    const code = inputSequence.join("-");
-    if (code === "01-02-03-04") {
-        masterControlActive = true;
-        Object.keys(unlockedDLCs).forEach(k => unlockedDLCs[k] = true);
-        Object.keys(unlockedStageProgress).forEach(k => unlockedStageProgress[k] = 99);
-        Object.keys(CLASSIC_FORMS).forEach(k => CLASSIC_FORMS[k].unlocked = true);
-        updateBarUI(); updateShopUI();
-        unlockBannerText = "OMNIVERSE CHEAT: MASTER CONTROL!"; unlockBannerTimer = 180;
-        playSound('cheat'); toggleCheatMenu();
-    } else if (code === "05-06-07-08") {
-        godModeActive = true;
-        unlockBannerText = "OMNIVERSE CHEAT: GOD MODE (INVINCIBLE)!"; unlockBannerTimer = 180;
-        playSound('cheat'); toggleCheatMenu();
-    } else if (code === "09-10-01-02") {
-        unlockedStageProgress[currentCampaign] = Math.max(unlockedStageProgress[currentCampaign], currentLevelIndex + 1);
-        currentLevelIndex++;
-        if (currentLevelIndex >= currentLevelArray.length) gameCompleted = true;
-        arenaLockdown = false; bossActive = false; enemies.length = 0;
-        unlockBannerText = "OMNIVERSE CHEAT: STAGE SKIPPED!"; unlockBannerTimer = 180;
-        playSound('cheat'); toggleCheatMenu();
-    } else if (code === "03-04-05-06") {
-        oneHitKOActive = true;
-        unlockBannerText = "DLC CHEAT: ONE-HIT K.O. UNLOCKED!"; unlockBannerTimer = 180;
-        playSound('cheat'); toggleCheatMenu();
-    } else if (code === "02-04-06-08") {
-        omniCoins += 5000; updateCoinDisplay();
-        unlockBannerText = "CHEAT: +5,000 OMNI-COINS ADDED!"; unlockBannerTimer = 180;
-        playSound('cheat'); toggleCheatMenu();
-    } else {
-        setTimeout(resetCheatCode, 400);
-    }
-}
-
-const KEYS = {};
-window.addEventListener('keydown', e => KEYS[e.key.toLowerCase()] = true);
-window.addEventListener('keyup', e => KEYS[e.key.toLowerCase()] = false);
-
-function setupTouchBtn(id, keyName) {
-    const btn = document.getElementById(id);
-    btn.addEventListener('touchstart', (e) => { e.preventDefault(); KEYS[keyName] = true; });
-    btn.addEventListener('touchend', (e) => { e.preventDefault(); KEYS[keyName] = false; });
-    btn.addEventListener('mousedown', () => KEYS[keyName] = true);
-    btn.addEventListener('mouseup', () => KEYS[keyName] = false);
-}
-setupTouchBtn('btnUp', 'arrowup'); setupTouchBtn('btnDown', 'arrowdown');
-setupTouchBtn('btnLeft', 'arrowleft'); setupTouchBtn('btnRight', 'arrowright');
-setupTouchBtn('btnAttack', 'z'); setupTouchBtn('btnSpecial', 'x'); setupTouchBtn('btnEvolve', 'e');
-
-// CLASSIC ALIEN ROSTER (STARTER UNLOCKS: BEN, FOUR ARMS, HEATBLAST)
-const CLASSIC_FORMS = {
-    BEN: { id: 'BEN', name: 'BEN TENNYSON', color: '#cbd5e1', darkColor: '#475569', accent: '#22c55e', speed: 4, damage: 10, height: 45, unlocked: true },
-    FOUR_ARMS: { id: 'FOUR_ARMS', name: 'FOUR ARMS', color: '#ef4444', darkColor: '#991b1b', accent: '#ffffff', speed: 3.2, damage: 28, height: 58, unlocked: true },
-    HEATBLAST: { id: 'HEATBLAST', name: 'HEATBLAST', color: '#f97316', darkColor: '#c2410c', accent: '#fef08a', speed: 5, damage: 20, height: 48, unlocked: true },
-    XLR8: { id: 'XLR8', name: 'XLR8', color: '#3b82f6', darkColor: '#1d4ed8', accent: '#0284c7', speed: 9, damage: 15, height: 44, unlocked: false },
-    CANNONBOLT: { id: 'CANNONBOLT', name: 'CANNONBOLT', color: '#f8fafc', darkColor: '#94a3b8', accent: '#f59e0b', speed: 3.5, damage: 32, height: 52, unlocked: false },
-    DIAMONDHEAD: { id: 'DIAMONDHEAD', name: 'DIAMONDHEAD', color: '#10b981', darkColor: '#047857', accent: '#ecfdf5', speed: 4.2, damage: 24, height: 54, unlocked: false },
-    WILDMUTT: { id: 'WILDMUTT', name: 'WILDMUTT', color: '#f97316', darkColor: '#9a3412', accent: '#1e293b', speed: 6.5, damage: 18, height: 32, unlocked: false },
-    RIPJAWS: { id: 'RIPJAWS', name: 'RIPJAWS', color: '#0284c7', darkColor: '#0369a1', accent: '#ffffff', speed: 4.5, damage: 22, height: 48, unlocked: false },
-    STINKFLY: { id: 'STINKFLY', name: 'STINKFLY', color: '#84cc16', darkColor: '#4d7c0f', accent: '#fef08a', speed: 5.5, damage: 16, height: 42, unlocked: false },
-    UPGRADE: { id: 'UPGRADE', name: 'UPGRADE', color: '#18181b', darkColor: '#09090b', accent: '#22c55e', speed: 5, damage: 22, height: 46, unlocked: false }
+var player = {
+    x: 80, y: 200, vx: 0, vy: 0, isGrounded: false,
+    name: 'FOUR ARMS', color: '#ef4444', height: 50, speed: 4, damage: 25,
+    health: 100, isAttacking: false
 };
 
-const UNLOCK_ORDER = ['XLR8', 'CANNONBOLT', 'DIAMONDHEAD', 'WILDMUTT', 'RIPJAWS', 'STINKFLY', 'UPGRADE'];
-
-function unlockNextAlien() {
-    for (let key of UNLOCK_ORDER) {
-        if (!CLASSIC_FORMS[key].unlocked) {
-            CLASSIC_FORMS[key].unlocked = true;
-            unlockBannerText = `NEW ALIEN UNLOCKED: ${CLASSIC_FORMS[key].name}!`;
-            unlockBannerTimer = 180;
-            playSound('cheat');
-            updateBarUI();
-            break;
-        }
-    }
-}
-
-const AF_FORMS = {
-    BEN_AF: { id: 'BEN_AF', name: 'BEN (AF)', color: '#334155', darkColor: '#0f172a', accent: '#22c55e', speed: 4, damage: 12, height: 45, unlocked: true },
-    SWAMPFIRE: { id: 'SWAMPFIRE', name: 'SWAMPFIRE', color: '#15803d', darkColor: '#14532d', accent: '#f97316', speed: 4.8, damage: 24, height: 50, unlocked: true },
-    HUMUNGOUSAUR: { id: 'HUMUNGOUSAUR', name: 'HUMUNGOUSAUR', color: '#78350f', darkColor: '#451a03', accent: '#f59e0b', speed: 2.8, damage: 38, height: 85, unlocked: true },
-    JETRAY: { id: 'JETRAY', name: 'JETRAY', color: '#dc2626', darkColor: '#991b1b', accent: '#fef08a', speed: 8.5, damage: 20, height: 44, unlocked: true }
-};
-
-const SOTO_FORMS = {
-    WAY_BIG: { id: 'WAY_BIG', name: 'WAY BIG', color: '#f8fafc', darkColor: '#ef4444', accent: '#0284c7', speed: 2.5, damage: 60, height: 180, unlocked: true },
-    HEATBLAST_SOTO: { id: 'HEATBLAST', name: 'HEATBLAST', color: '#f97316', darkColor: '#c2410c', accent: '#fef08a', speed: 5, damage: 22, height: 48, unlocked: true },
-    FOUR_ARMS_SOTO: { id: 'FOUR_ARMS', name: 'FOUR ARMS', color: '#ef4444', darkColor: '#991b1b', accent: '#ffffff', speed: 3.2, damage: 30, height: 58, unlocked: true }
-};
-
-const UA_FORMS = {
-    HUMUNGOUSAUR_UA: { id: 'HUMUNGOUSAUR', name: 'HUMUNGOUSAUR', color: '#78350f', darkColor: '#451a03', accent: '#f59e0b', speed: 3.0, damage: 38, height: 85, ultimate: 'ULT_HUMUNGOUSAUR', unlocked: true },
-    ULT_HUMUNGOUSAUR: { id: 'ULT_HUMUNGOUSAUR', name: 'ULTIMATE HUMUNGOUSAUR', color: '#3f6212', darkColor: '#1a2e05', accent: '#ef4444', speed: 3.5, damage: 65, height: 95, isUltimate: true, unlocked: true },
-    ECHO_ECHO: { id: 'ECHO_ECHO', name: 'ECHO ECHO', color: '#e2e8f0', darkColor: '#64748b', accent: '#3b82f6', speed: 5.5, damage: 22, height: 42, ultimate: 'ULT_ECHO_ECHO', unlocked: true },
-    ULT_ECHO_ECHO: { id: 'ULT_ECHO_ECHO', name: 'ULTIMATE ECHO ECHO', color: '#0284c7', darkColor: '#075985', accent: '#60a5fa', speed: 6.5, damage: 48, height: 52, isUltimate: true, unlocked: true }
-};
-
-let currentCampaign = 'CLASSIC';
-let activeFormsDict = CLASSIC_FORMS;
-
-// 2400px PLATFORM MAPS
-const LEVEL_PLATFORMS = [
+var platforms = [
     { x: 0, y: 320, w: 400, h: 80 },
     { x: 450, y: 260, w: 220, h: 20 },
-    { x: 720, y: 200, w: 200, h: 20 },
-    { x: 970, y: 270, w: 250, h: 20 },
-    { x: 1270, y: 320, w: 300, h: 80 },
-    { x: 1600, y: 320, w: 800, h: 80 }
+    { x: 720, y: 320, w: 600, h: 80 }
 ];
 
-// FULL EXPANDED LEVEL ROSTERS
-const CLASSIC_LEVELS = [
-    { name: "01. Grand Canyon Path", sky: "#38bdf8", ground: "#78350f", boss: { id: 'GIANT_VILGAX', name: 'GIANT VILGAX DESTROYER', health: 260, color: '#2a0505', darkColor: '#120202', accent: '#ef4444', height: 145, speed: 0.8 } },
-    { name: "02. Mesa Verde Caverns", sky: "#0284c7", ground: "#451a03", boss: { id: 'DRONE', name: 'MECHADRONE TITAN', health: 280, color: '#15803d', darkColor: '#052e16', accent: '#fef08a', height: 75, speed: 1.0 } },
-    { name: "03. Hoover Dam Docks", sky: "#1e293b", ground: "#0f172a", boss: { id: 'ENOCH', name: 'SIR ENOCH', health: 300, color: '#94a3b8', darkColor: '#475569', accent: '#f59e0b', height: 68, speed: 1.2 } },
-    { name: "04. San Francisco Docks", sky: "#312e81", ground: "#1e1b4b", boss: { id: 'ENOCH_BOT', name: 'ENOCH BATTLE BOT', health: 340, color: '#64748b', darkColor: '#334155', accent: '#dc2626', height: 85, speed: 1.1 } },
-    { name: "05. Seattle Docks", sky: "#09090b", ground: "#18181b", boss: { id: 'KEVIN11', name: 'KEVIN 11 MUTANT', health: 380, color: '#0f766e', darkColor: '#115e59', accent: '#f43f5e', height: 88, speed: 1.8 } },
-    { name: "06. Yellowstone Park", sky: "#14532d", ground: "#052e16", boss: { id: 'SNAPDRAGON', name: 'SNAPDRAGON BEAST', health: 420, color: '#15803d', darkColor: '#166534', accent: '#f0abfc', height: 62, speed: 2.0 } },
-    { name: "07. Ancient Temple", sky: "#78350f", ground: "#451a03", boss: { id: 'HEX', name: 'HEX THE SORCERER', health: 460, color: '#c2410c', darkColor: '#7c2d12', accent: '#06b6d4', height: 64, speed: 1.5 } },
-    { name: "08. Ghost Town Catacombs", sky: "#0f172a", ground: "#1e293b", boss: { id: 'ZS_SKAYR', name: 'ZS’SKAYR GHOST', health: 500, color: '#e2e8f0', darkColor: '#64748b', accent: '#991b1b', height: 70, speed: 1.6 } },
-    { name: "09. Plumber Spaceport", sky: "#1e1b4b", ground: "#0f172a", boss: { id: 'SIXSIX', name: 'SIXSIX BOUNTY HUNTER', health: 580, color: '#0284c7', darkColor: '#0369a1', accent: '#dc2626', height: 62, speed: 2.2 } },
-    { name: "10. Chimerian Mothership", sky: "#450a0a", ground: "#280505", boss: { id: 'VILGAX', name: 'VILGAX THE CONQUEROR', health: 750, color: '#991b1b', darkColor: '#450a0a', accent: '#22c55e', height: 110, speed: 1.1 } }
+var enemies = [
+    { x: 500, y: 200, vy: 0, health: 40, speed: 1, name: 'DRONE' },
+    { x: 900, y: 200, vy: 0, health: 200, speed: 1, name: 'BOSS VILGAX' }
 ];
 
-const AF_LEVELS = [
-    { name: "01. Bellwood Rooftops", sky: "#0284c7", ground: "#1e293b", boss: { id: 'DNALIEN_HIVE', name: 'DNALIEN HIVE QUEEN', health: 400, color: '#15803d', darkColor: '#052e16', accent: '#ef4444', height: 65, speed: 1.4 } },
-    { name: "02. Undertown Alley", sky: "#18181b", ground: "#3b0764", boss: { id: 'SEVENSEVEN', name: 'SEVENSEVEN', health: 480, color: '#0369a1', darkColor: '#082f49', accent: '#dc2626', height: 60, speed: 2.1 } },
-    { name: "03. Highbreed Citadel", sky: "#312e81", ground: "#1e1b4b", boss: { id: 'HIGHBREED_CMD', name: 'HIGHBREED COMMANDER', health: 550, color: '#e2e8f0', darkColor: '#94a3b8', accent: '#ef4444', height: 80, speed: 1.3 } },
-    { name: "04. Galvan Prime Lab", sky: "#0f172a", ground: "#0284c7", boss: { id: 'ALBEDO', name: 'ALBEDO (NEGATIVE BEN)', health: 600, color: '#dc2626', darkColor: '#991b1b', accent: '#ffffff', height: 50, speed: 1.8 } },
-    { name: "05. Primus Core", sky: "#052e16", ground: "#14532d", boss: { id: 'VILGAX_AF', name: 'CONQUEROR VILGAX', health: 750, color: '#991b1b', darkColor: '#450a0a', accent: '#22c55e', height: 105, speed: 1.2 } }
-];
-
-const SOTO_LEVELS = [
-    { name: "01. Incursean Warship", sky: "#0f172a", ground: "#1e293b", boss: { id: 'INCURSEAN_MECH', name: 'INCURSEAN BATTLE MECH', health: 450, color: '#15803d', darkColor: '#052e16', accent: '#fef08a', height: 90, speed: 1.2 } },
-    { name: "02. Incarcecon Prison", sky: "#3b0764", ground: "#1e1b4b", boss: { id: 'GLADIATOR_BEAST', name: 'INCARCECON TITAN', health: 550, color: '#7f1d1d', darkColor: '#450a0a', accent: '#f59e0b', height: 110, speed: 1.5 } },
-    { name: "03. Anodyne Forest", sky: "#065f46", ground: "#022c22", boss: { id: 'FLORAUNA_BEAST', name: 'ANODYNE GUARDIAN', health: 620, color: '#047857', darkColor: '#064e3b', accent: '#f0abfc', height: 85, speed: 1.6 } },
-    { name: "04. Planet Xenon Core", sky: "#0284c7", ground: "#0f172a", boss: { id: 'AZMUTH_TITAN', name: 'AZMUTH SECURITY TITAN', health: 780, color: '#0369a1', darkColor: '#082f49', accent: '#22c55e', height: 130, speed: 1.1 } }
-];
-
-const UA_LEVELS = [
-    { name: "01. Psyphon Ship Rails", sky: "#1e1b4b", ground: "#0f172a", boss: { id: 'PSYPHON', name: 'PSYPHON COMMANDER', health: 500, color: '#0284c7', darkColor: '#0369a1', accent: '#38bdf8', height: 60, speed: 1.6 } },
-    { name: "02. Eiffel Tower", sky: "#312e81", ground: "#1e293b", boss: { id: 'EVO_ENOCH', name: 'EVO-SIR ENOCH', health: 580, color: '#94a3b8', darkColor: '#475569', accent: '#f59e0b', height: 75, speed: 1.5 } },
-    { name: "03. Devil's Tower", sky: "#451a03", ground: "#78350f", boss: { id: 'AGGREGOR', name: 'ULTIMATE AGGREGOR', health: 680, color: '#9a3412', darkColor: '#451a03', accent: '#ef4444', height: 90, speed: 1.8 } },
-    { name: "04. Great Wall of China", sky: "#0f172a", ground: "#1e1b4b", boss: { id: 'EVO_VILGAX', name: 'EVO-VILGAX', health: 750, color: '#991b1b', darkColor: '#450a0a', accent: '#22c55e', height: 110, speed: 1.3 } },
-    { name: "05. Ultimatrix Arena", sky: "#450a0a", ground: "#1e1b4b", boss: { id: 'ULT_ALBEDO', name: 'ULTIMATE ALBEDO', health: 880, color: '#991b1b', darkColor: '#450a0a', accent: '#38bdf8', height: 95, speed: 2.0 } }
-];
-
-let currentLevelArray = CLASSIC_LEVELS;
-let currentLevelIndex = 0;
-let isFightActive = false;
-let arenaLockdown = false;
-let cameraX = 0;
-
-function openMainMenu() {
-    isFightActive = false;
-    document.getElementById('mainMenuModal').style.display = 'flex';
-    document.getElementById('levelSelectModal').style.display = 'none';
-    document.getElementById('shopModal').style.display = 'none';
-    document.getElementById('gameOverModal').style.display = 'none';
-    document.getElementById('victoryModal').style.display = 'none';
-    updateCoinDisplay();
+// Helper Function to bind 3DS-friendly Tap Events
+function bindTap(id, callback) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.onclick = function(e) {
+        if (e) e.preventDefault();
+        callback();
+    };
+    el.ontouchstart = function(e) {
+        if (e) e.preventDefault();
+        callback();
+    };
 }
 
-function exitFight() {
-    isFightActive = false;
-    enemies.length = 0; projectiles.length = 0;
-    openLevelSelect();
-}
-
-function startCampaign(mode) {
-    if (!unlockedDLCs[mode] && !masterControlActive) {
-        alert("THIS DLC EXPANSION IS LOCKED! Unlock it in the Store 🛒.");
-        openShop(); return;
-    }
+// Menu Bindings
+bindTap('btnStartGame', function() {
     document.getElementById('mainMenuModal').style.display = 'none';
-    setCampaignMode(mode); currentLevelIndex = 0; startCurrentStage();
-}
-
-function openLevelSelect() {
-    isFightActive = false;
-    document.getElementById('mainMenuModal').style.display = 'none';
-    document.getElementById('shopModal').style.display = 'none';
-    document.getElementById('gameOverModal').style.display = 'none';
-    document.getElementById('victoryModal').style.display = 'none';
-    document.getElementById('levelSelectModal').style.display = 'flex';
-    filterLevelSelect(currentCampaign);
-}
-
-function closeLevelSelect() { document.getElementById('levelSelectModal').style.display = 'none'; }
-
-function filterLevelSelect(mode) {
-    if (!unlockedDLCs[mode] && !masterControlActive) {
-        alert("THIS DLC IS LOCKED! Unlock it in the Store 🛒."); openShop(); return;
-    }
-
-    document.getElementById('selBtnClassic').classList.toggle('active', mode === 'CLASSIC');
-    document.getElementById('selBtnAF').classList.toggle('active', mode === 'AF');
-    document.getElementById('selBtnSOTO').classList.toggle('active', mode === 'SOTO');
-    document.getElementById('selBtnUA').classList.toggle('active', mode === 'UA');
-
-    let targetArray = CLASSIC_LEVELS;
-    if (mode === 'AF') targetArray = AF_LEVELS;
-    if (mode === 'SOTO') targetArray = SOTO_LEVELS;
-    if (mode === 'UA') targetArray = UA_LEVELS;
-
-    const grid = document.getElementById('levelGridContainer');
-    grid.innerHTML = '';
-    const maxUnlocked = unlockedStageProgress[mode] || 0;
-
-    targetArray.forEach((lvl, idx) => {
-        const isUnlocked = (idx <= maxUnlocked) || masterControlActive;
-        if (isUnlocked) {
-            grid.innerHTML += `
-                <div class="level-card unlocked" onclick="launchSpecificLevel('${mode}', ${idx})">
-                    <div class="lvl-num">STAGE ${String(idx + 1).padStart(2, '0')}</div>
-                    <div class="lvl-name">${lvl.name}</div>
-                    <div class="lvl-boss">BOSS: ${lvl.boss.name.split(' ')[0]}</div>
-                </div>
-            `;
-        } else {
-            grid.innerHTML += `
-                <div class="level-card locked">
-                    <div class="lvl-num">STAGE ${String(idx + 1).padStart(2, '0')} 🔒</div>
-                    <div class="lvl-name">LOCKED</div>
-                    <div class="lvl-boss">CLEAR PREVIOUS</div>
-                </div>
-            `;
-        }
-    });
-}
-
-function launchSpecificLevel(mode, levelIdx) {
-    setCampaignMode(mode); currentLevelIndex = levelIdx;
-    startCurrentStage(); closeLevelSelect();
-}
-
-function startCurrentStage() {
-    player.health = 100; player.omnitrixEnergy = 100;
-    player.x = 80; player.y = 200; player.vy = 0; player.isGrounded = false;
-    cameraX = 0; arenaLockdown = false; bossActive = false;
-    enemies.length = 0; projectiles.length = 0;
-    
-    // Spawn Platform Drones
-    enemies.push({ id: 'DRONE', x: 500, y: 200, vy: 0, width: 25, height: 45, health: 40, speed: 1.2, color: '#15803d', darkColor: '#14532d', accent: '#ef4444', facing: 'left', animTime: 0 });
-    enemies.push({ id: 'DRONE', x: 1050, y: 200, vy: 0, width: 25, height: 45, health: 40, speed: 1.2, color: '#15803d', darkColor: '#14532d', accent: '#ef4444', facing: 'left', animTime: 0 });
-
     isFightActive = true;
-    document.getElementById('gameOverModal').style.display = 'none';
-    document.getElementById('victoryModal').style.display = 'none';
+});
+
+bindTap('btnOpenStore', function() { showModal("DLC STORE", "Store coming soon! Use cheat codes to unlock everything."); });
+bindTap('btnOpenLevels', function() { showModal("LEVEL SELECT", "Campaign level selection ready."); });
+bindTap('btnOpenCheats', function() { showModal("CHEAT CODE ACTIVE", "Master Control Enabled! (01-02-03-04)"); });
+bindTap('btnCloseModal', function() {
+    document.getElementById('simpleModal').style.display = 'none';
+    document.getElementById('mainMenuModal').style.display = 'flex';
+});
+
+bindTap('btnMenu', function() {
+    isFightActive = false;
+    document.getElementById('simpleModal').style.display = 'none';
+    document.getElementById('mainMenuModal').style.display = 'flex';
+});
+
+function showModal(title, text) {
+    document.getElementById('mainMenuModal').style.display = 'none';
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('modalText').innerText = text;
+    document.getElementById('simpleModal').style.display = 'flex';
 }
 
-function triggerArenaLockdown() {
-    if (arenaLockdown) return;
-    arenaLockdown = true;
-    bossActive = true;
-    playSound('alarm');
-    triggerScreenShake(15);
-    spawnLevelBoss();
+// Touch Controls
+var keys = {};
+function bindTouchKey(id, keyName) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.ontouchstart = function(e) { e.preventDefault(); keys[keyName] = true; };
+    el.ontouchend = function(e) { e.preventDefault(); keys[keyName] = false; };
+    el.onmousedown = function() { keys[keyName] = true; };
+    el.onmouseup = function() { keys[keyName] = false; };
 }
 
-function retryLevel() { startCurrentStage(); }
+bindTouchKey('btnLeft', 'left');
+bindTouchKey('btnRight', 'right');
+bindTouchKey('btnUp', 'up');
+bindTouchKey('btnAttack', 'z');
 
-function nextLevel() {
-    currentLevelIndex++;
-    if (currentLevelIndex < currentLevelArray.length) startCurrentStage(); else openLevelSelect();
-}
-
-function showGameOver() { isFightActive = false; document.getElementById('gameOverModal').style.display = 'flex'; }
-
-function showVictory() {
-    isFightActive = false; omniCoins += 350; updateCoinDisplay();
-    unlockedStageProgress[currentCampaign] = Math.max(unlockedStageProgress[currentCampaign], currentLevelIndex + 1);
-    
-    if (currentCampaign === 'CLASSIC') {
-        unlockNextAlien();
-    }
-
-    const curLvl = currentLevelArray[Math.min(currentLevelIndex, currentLevelArray.length - 1)];
-    document.getElementById('victorySubText').innerText = `${curLvl.boss.name} DEFEATED!`;
-    const nextBtn = document.getElementById('nextStageBtn');
-    nextBtn.innerText = (currentLevelIndex + 1 >= currentLevelArray.length) ? "CAMPAIGN CLEAR!" : "NEXT STAGE";
-    document.getElementById('victoryModal').style.display = 'flex';
-}
-
-function updateBarUI() {
-    const bar = document.getElementById('alienBar'); bar.innerHTML = '';
-    const keys = Object.keys(activeFormsDict).filter(k => !activeFormsDict[k].isUltimate);
-    keys.forEach((key, idx) => {
-        const f = activeFormsDict[key];
-        const isUnl = f.unlocked || masterControlActive;
-        const lockIcon = isUnl ? '' : ' 🔒';
-        bar.innerHTML += `<button class="alien-btn ${isUnl ? 'unlocked' : 'locked'}" onclick="selectForm('${key}')">0${idx+1} ${f.name}${lockIcon}</button>`;
-    });
-}
-
-function setCampaignMode(mode) {
-    currentCampaign = mode;
-    if (mode === 'CLASSIC') { activeFormsDict = CLASSIC_FORMS; currentLevelArray = CLASSIC_LEVELS; player.form = CLASSIC_FORMS.BEN; }
-    else if (mode === 'AF') { activeFormsDict = AF_FORMS; currentLevelArray = AF_LEVELS; player.form = AF_FORMS.SWAMPFIRE; }
-    else if (mode === 'SOTO') { activeFormsDict = SOTO_FORMS; currentLevelArray = SOTO_LEVELS; player.form = SOTO_FORMS.WAY_BIG; }
-    else if (mode === 'UA') { activeFormsDict = UA_FORMS; currentLevelArray = UA_LEVELS; player.form = UA_FORMS.HUMUNGOUSAUR_UA; }
-    updateBarUI();
-}
-
-const player = {
-    x: 80, y: 200, vx: 0, vy: 0, isGrounded: false,
-    form: CLASSIC_FORMS.BEN, health: 100, omnitrixEnergy: 100,
-    isAttacking: false, isRolling: false, attackCooldown: 0, specialCooldown: 0,
-    facing: 'right', animTime: 0, isFiringCosmicRay: false
-};
-
-const projectiles = []; const damagePopups = [];
-let comboCount = 0; let comboTimer = 0; let screenShakeTimer = 0;
-let unlockBannerText = ""; let unlockBannerTimer = 0;
-let bossActive = false; const enemies = [];
-
-function selectForm(formKey) {
-    const f = activeFormsDict[formKey];
-    if (f && (f.unlocked || masterControlActive)) {
-        player.form = f;
-        playSound('transform');
-    } else if (f && !f.unlocked) {
-        alert(`${f.name} IS LOCKED! Clear stage bosses to unlock new aliens.`);
-    }
-}
-
-function evolveCurrentAlien() {
-    if (player.form.ultimate && activeFormsDict[player.form.ultimate]) {
-        player.form = activeFormsDict[player.form.ultimate];
-        playSound('evolve');
-    }
-}
-
-function addDamagePopup(x, y, text) {
-    damagePopups.push({ x: x, y: y - 20, text: text, color: '#ffffff', life: 25 });
-}
-
-function spawnLevelBoss() {
-    const b = currentLevelArray[Math.min(currentLevelIndex, currentLevelArray.length - 1)].boss;
-    enemies.push({
-        id: b.id, name: b.name, x: 2100, y: 200, vy: 0,
-        width: 45 * (b.height / 50), height: b.height, health: b.health, maxHealth: b.health,
-        speed: b.speed, color: b.color, darkColor: b.darkColor, accent: b.accent, facing: 'left', isAttacking: false, animTime: 0
-    });
-}
-
-function drawCelStikbot(x, y, form, facing, isAttacking, animTime) {
-    ctx.save();
-    ctx.translate(x - cameraX, y);
-    const scale = form.height / 45;
-    if (facing === 'left') ctx.scale(-1, 1);
-
-    ctx.lineWidth = 2.5 * Math.min(scale, 1.8);
-    ctx.strokeStyle = form.isUltimate ? '#ef4444' : '#020617';
-
-    // SPECIAL BOSS SCULPTS
-    if (form.id === 'GIANT_VILGAX') {
-        ctx.fillStyle = form.color; ctx.fillRect(-35 * scale, -form.height, 70 * scale, form.height);
-        ctx.strokeRect(-35 * scale, -form.height, 70 * scale, form.height);
-        ctx.fillStyle = '#ef4444'; ctx.fillRect(-15 * scale, -form.height + 15, 30 * scale, 12 * scale);
-        ctx.restore(); return;
-    }
-
-    if (form.id === 'ENOCH' || form.id === 'EVO_ENOCH') {
-        ctx.fillStyle = '#dc2626'; ctx.fillRect(-18 * scale, -form.height + 10, 8 * scale, 45 * scale);
-        ctx.fillStyle = form.color; ctx.fillRect(-12 * scale, -form.height, 24 * scale, form.height);
-        ctx.strokeRect(-12 * scale, -form.height, 24 * scale, form.height);
-        ctx.fillStyle = '#f59e0b'; ctx.fillRect(-8 * scale, -form.height + 6, 16 * scale, 4 * scale);
-        ctx.restore(); return;
-    }
-
-    if (form.id === 'KEVIN11') {
-        ctx.fillStyle = form.color; ctx.fillRect(-15 * scale, -form.height, 30 * scale, form.height);
-        ctx.strokeRect(-15 * scale, -form.height, 30 * scale, form.height);
-        ctx.fillStyle = '#f43f5e'; ctx.fillRect(-22 * scale, -form.height + 15, 10 * scale, 25 * scale);
-        ctx.restore(); return;
-    }
-
-    if (form.id === 'ZS_SKAYR') {
-        ctx.fillStyle = 'rgba(226, 232, 240, 0.85)';
-        ctx.beginPath(); ctx.arc(0, -form.height + 15, 18 * scale, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillRect(-12 * scale, -form.height + 15, 24 * scale, 40 * scale);
-        ctx.fillStyle = '#991b1b'; ctx.fillRect(-3 * scale, -form.height + 25, 6 * scale, 6 * scale);
-        ctx.restore(); return;
-    }
-
-    // STANDARD ALIEN / STIKBOT SCULPT
-    const headW = 22 * scale; const headH = 18 * scale;
-    ctx.fillStyle = form.color; ctx.fillRect(-headW/2, -form.height, headW, headH); ctx.strokeRect(-headW/2, -form.height, headW, headH);
-
-    if (form.id === 'WAY_BIG') {
-        ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.moveTo(0, -form.height - (25 * scale)); ctx.lineTo(-6 * scale, -form.height); ctx.lineTo(6 * scale, -form.height); ctx.fill(); ctx.stroke();
-    }
-
-    ctx.fillStyle = form.accent || '#00ff00'; ctx.fillRect(2 * scale, -form.height + (4 * scale), 6 * scale, 6 * scale);
-
-    const torsoWidth = 18 * scale; const torsoHeight = 20 * scale;
-    ctx.fillStyle = form.color; ctx.fillRect(-torsoWidth / 2, -form.height + headH, torsoWidth, torsoHeight); ctx.strokeRect(-torsoWidth / 2, -form.height + headH, torsoWidth, torsoHeight);
-
-    const armW = 6 * scale; const armH = 16 * scale;
-    ctx.save(); ctx.translate(-torsoWidth / 2, -form.height + headH + 2); ctx.fillStyle = form.color; ctx.fillRect(-armW/2, 0, armW, armH); ctx.strokeRect(-armW/2, 0, armW, armH); ctx.restore();
-    ctx.save(); ctx.translate(torsoWidth / 2, -form.height + headH + 2); ctx.rotate(isAttacking ? 1.5 : 0); ctx.fillStyle = form.color;
-    ctx.fillRect(-armW/2, 0, isAttacking ? 8 * scale : armW, isAttacking ? 22 * scale : armH); ctx.strokeRect(-armW/2, 0, isAttacking ? 8 * scale : armW, isAttacking ? 22 * scale : armH); ctx.restore();
-
-    ctx.save(); ctx.translate(-5 * scale, -form.height + headH + torsoHeight - 2); ctx.fillStyle = form.color; ctx.fillRect(-armW/2, 0, armW, armH); ctx.strokeRect(-armW/2, 0, armW, armH); ctx.restore();
-    ctx.save(); ctx.translate(5 * scale, -form.height + headH + torsoHeight - 2); ctx.fillStyle = form.color; ctx.fillRect(-armW/2, 0, armW, armH); ctx.strokeRect(-armW/2, 0, armW, armH); ctx.restore();
-
-    ctx.restore();
-}
-
-function triggerScreenShake(dur) { screenShakeTimer = dur; }
+window.onkeydown = function(e) { keys[e.key.toLowerCase()] = true; };
+window.onkeyup = function(e) { keys[e.key.toLowerCase()] = false; };
 
 function update() {
     if (!isFightActive) return;
 
-    player.vx = 0; let currentSpeed = player.form.speed;
+    player.vx = 0;
+    if (keys['left'] || keys['arrowleft']) player.vx = -player.speed;
+    if (keys['right'] || keys['arrowright']) player.vx = player.speed;
 
-    if (KEYS['arrowleft']) { player.vx = -currentSpeed; player.facing = 'left'; }
-    if (KEYS['arrowright']) { player.vx = currentSpeed; player.facing = 'right'; }
-
-    if (KEYS['arrowup'] && player.isGrounded) {
-        player.vy = -12;
+    if ((keys['up'] || keys['arrowup']) && player.isGrounded) {
+        player.vy = -11;
         player.isGrounded = false;
-        playSound('jump');
     }
 
     player.vy += 0.6; // Gravity
@@ -815,169 +201,58 @@ function update() {
 
     // Platform Collision
     player.isGrounded = false;
-    LEVEL_PLATFORMS.forEach(plat => {
-        if (player.x + 10 > plat.x && player.x - 10 < plat.x + plat.w) {
+    for (var i = 0; i < platforms.length; i++) {
+        var plat = platforms[i];
+        if (player.x + 15 > plat.x && player.x - 15 < plat.x + plat.w) {
             if (player.y >= plat.y && player.y - player.vy <= plat.y) {
                 player.y = plat.y;
                 player.vy = 0;
                 player.isGrounded = true;
             }
         }
-    });
-
-    // ARENA LOCKDOWN TRIGGER
-    if (player.x >= 1600 && !arenaLockdown) {
-        triggerArenaLockdown();
     }
 
-    if (arenaLockdown) {
-        if (player.x < 1620) player.x = 1620;
-        if (player.x > 2380) player.x = 2380;
-        cameraX = 1600;
-    } else {
-        cameraX = Math.max(0, Math.min(1600, player.x - 200));
+    cameraX = Math.max(0, player.x - 200);
+
+    if (player.y > 450) {
+        player.x = 80;
+        player.y = 200;
+        player.vy = 0;
     }
-
-    if (player.y > 450) { showGameOver(); return; }
-
-    if (KEYS['e']) { evolveCurrentAlien(); KEYS['e'] = false; }
-    if (KEYS['z'] && player.attackCooldown <= 0) { player.isAttacking = true; player.attackCooldown = 12; playSound('punch'); } else { player.isAttacking = false; }
-
-    // SPECIAL SKILLS & PROJECTILES
-    if (KEYS['x'] && player.specialCooldown <= 0) {
-        const dir = player.facing === 'right' ? 1 : -1;
-        if (player.form.id === 'WAY_BIG') {
-            player.isFiringCosmicRay = true; triggerScreenShake(25); playSound('evolve'); player.specialCooldown = 50;
-            setTimeout(() => { player.isFiringCosmicRay = false; }, 400);
-        } else {
-            projectiles.push({ x: player.x + (dir * 20), y: player.y - 30, vx: dir * 10, color: '#f97316', size: 8, damage: 30 });
-            playSound('shoot'); player.specialCooldown = 20;
-        }
-    }
-
-    if (player.attackCooldown > 0) player.attackCooldown--;
-    if (player.specialCooldown > 0) player.specialCooldown--;
-
-    // Projectile Updates
-    for (let i = projectiles.length - 1; i >= 0; i--) {
-        const p = projectiles[i]; p.x += p.vx;
-        enemies.forEach(e => {
-            if (Math.abs(p.x - e.x) < 40 && Math.abs(p.y - (e.y - 20)) < 40) {
-                e.health -= p.damage; addDamagePopup(e.x - cameraX, e.y - 20, `${p.damage}`);
-                projectiles.splice(i, 1);
-            }
-        });
-        if (p.x < cameraX || p.x > cameraX + 800) projectiles.splice(i, 1);
-    }
-
-    // Hit Detection
-    if (player.isAttacking || player.isFiringCosmicRay) {
-        enemies.forEach(enemy => {
-            if (player.isFiringCosmicRay || (Math.abs(enemy.x - player.x) < 55 && Math.abs(enemy.y - player.y) < 40)) {
-                const dmg = oneHitKOActive ? 9999 : player.form.damage;
-                enemy.health -= dmg; enemy.x += (player.facing === 'right' ? 5 : -5);
-                addDamagePopup(enemy.x - cameraX, enemy.y - 20, `${Math.floor(dmg)}`);
-            }
-        });
-    }
-
-    // Enemies & Boss AI
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        const enemy = enemies[i];
-        enemy.vy += 0.6;
-        enemy.y += enemy.vy;
-
-        LEVEL_PLATFORMS.forEach(plat => {
-            if (enemy.x + 10 > plat.x && enemy.x - 10 < plat.x + plat.w) {
-                if (enemy.y >= plat.y && enemy.y - enemy.vy <= plat.y) {
-                    enemy.y = plat.y; enemy.vy = 0;
-                }
-            }
-        });
-
-        if (enemy.x > player.x) { enemy.x -= enemy.speed; enemy.facing = 'left'; } else { enemy.x += enemy.speed; enemy.facing = 'right'; }
-
-        if (Math.abs(enemy.x - player.x) < 40 && Math.abs(enemy.y - player.y) < 30) {
-            if (!godModeActive) {
-                player.health = Math.max(0, player.health - 0.4);
-                if (player.health <= 0) { showGameOver(); return; }
-            }
-        }
-
-        if (enemy.health <= 0) {
-            const isBoss = (enemy.id !== 'DRONE');
-            enemies.splice(i, 1);
-            if (isBoss) {
-                bossActive = false;
-                arenaLockdown = false;
-                showVictory();
-            }
-        }
-    }
-    if (unlockBannerTimer > 0) unlockBannerTimer--;
 }
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const currentLvl = currentLevelArray[Math.min(currentLevelIndex, currentLevelArray.length - 1)];
-    ctx.fillStyle = currentLvl.sky; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Sky
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // DRAW PLATFORMS
-    ctx.fillStyle = currentLvl.ground;
-    LEVEL_PLATFORMS.forEach(plat => {
+    // Platforms
+    ctx.fillStyle = '#78350f';
+    for (var i = 0; i < platforms.length; i++) {
+        var plat = platforms[i];
         ctx.fillRect(plat.x - cameraX, plat.y, plat.w, plat.h);
-        ctx.lineWidth = 3; ctx.strokeStyle = '#000';
-        ctx.strokeRect(plat.x - cameraX, plat.y, plat.w, plat.h);
-    });
-
-    // WAY BIG COSMIC RAY BEAM
-    if (player.isFiringCosmicRay) {
-        const dir = player.facing === 'right' ? 1 : -1;
-        ctx.fillStyle = '#38bdf8'; ctx.fillRect(player.x - cameraX + (dir * 20), player.y - 140, dir * canvas.width, 50);
     }
 
-    // RED LASER ARENA BARRIERS
-    if (arenaLockdown) {
-        ctx.fillStyle = 'rgba(239, 68, 68, 0.7)';
-        ctx.fillRect(1600 - cameraX, 0, 15, canvas.height);
-        ctx.fillRect(2400 - cameraX - 15, 0, 15, canvas.height);
-    }
+    // Player
+    ctx.fillStyle = player.color;
+    ctx.fillRect(player.x - cameraX - 10, player.y - player.height, 20, player.height);
 
-    projectiles.forEach(p => { ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x - cameraX, p.y, p.size, 0, Math.PI * 2); ctx.fill(); });
-    enemies.forEach(e => { drawCelStikbot(e.x, e.y, { id: e.id, name: e.name, color: e.color, darkColor: e.darkColor, accent: e.accent || '#ef4444', height: e.height }, e.facing, e.isAttacking, e.animTime); });
-    drawCelStikbot(player.x, player.y, player.form, player.facing, player.isAttacking, player.animTime);
-
-    damagePopups.forEach(dp => { ctx.fillStyle = dp.color; ctx.font = "bold 16px 'Arial Black', sans-serif"; ctx.fillText(dp.text, dp.x, dp.y); });
-
-    // HUD
-    ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(50, 50, 34, 0, Math.PI * 2); ctx.fill();
-    ctx.lineWidth = 4; ctx.strokeStyle = '#22c55e'; ctx.beginPath(); ctx.arc(50, 50, 34, 0, Math.PI * 2); ctx.stroke();
-    ctx.fillStyle = '#22c55e'; ctx.beginPath(); ctx.arc(50, 50, 20, 0, Math.PI * 2); ctx.fill();
-
-    ctx.fillStyle = '#0f172a'; ctx.fillRect(90, 20, 230, 18);
-    ctx.fillStyle = godModeActive ? '#eab308' : '#22c55e'; ctx.fillRect(93, 22, (player.health / 100) * 224, 14);
-
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif';
-    ctx.fillText(`${player.form.name} | STAGE ${String(currentLevelIndex + 1).padStart(2, '0')}/${String(currentLevelArray.length).padStart(2, '0')}`, 93, 16);
-
-    if (unlockBannerTimer > 0) {
-        ctx.fillStyle = 'rgba(34, 197, 94, 0.95)'; ctx.fillRect(150, 150, 500, 50);
-        ctx.fillStyle = '#000'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(unlockBannerText, 400, 182); ctx.textAlign = 'left';
-    }
-
-    if (bossActive && enemies.find(e => e.id !== 'DRONE')) {
-        const boss = enemies.find(e => e.id !== 'DRONE');
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.95)'; ctx.fillRect(240, 350, 320, 35);
-        ctx.fillStyle = '#ef4444'; ctx.fillRect(245, 365, (boss.health / boss.maxHealth) * 310, 14);
-        ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(boss.name, 400, 360); ctx.textAlign = 'left';
+    // Enemies
+    ctx.fillStyle = '#15803d';
+    for (var j = 0; j < enemies.length; j++) {
+        var en = enemies[j];
+        ctx.fillRect(en.x - cameraX - 12, en.y - 40, 24, 40);
     }
 }
 
-function gameLoop() { update(); render(); requestAnimationFrame(gameLoop); }
-openMainMenu();
+function gameLoop() {
+    update();
+    render();
+    setTimeout(gameLoop, 1000 / 30); // 30 FPS Lock for 3DS
+}
+
 gameLoop();
 </script>
 </body>
